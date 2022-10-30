@@ -1,19 +1,29 @@
---select * from districtdetails limit 10;
+/* A Learning Project for analysis on Census data set consisting of 2 CSV files, Districtdetails and DistrictParameters*/
+/* Analysis was performed using S3 storage, CSV files were converted to Glue tables using crawlers and then queried using Athena. */
 
---select * from districtparameter limit 10;
 
---select count(*) as total from districtdetails;
+--Preview of data
+select * from districtdetails limit 10;
 
---select count(*) as total from districtparameter;
 
- /*select d1.district,d1.state,d1.area_km2,d1.population,d2.growth,d2.sex_ratio,d2.growth from districtdetails d1 inner join districtparameter d2 on d1.State=d2.State and d1.state in ('Jharkhand','Bihar')*/
+select * from districtparameter limit 10;
 
+--To fetch total rows
+select count(*) as total from districtdetails;
+
+select count(*) as total from districtparameter;
+
+
+--data of states Jharkhand and Bihar
+ select d1.district,d1.state,d1.area_km2,d1.population,d2.growth,d2.sex_ratio,d2.growth from districtdetails d1 inner join districtparameter d2 on d1.State=d2.State and d1.state in ('Jharkhand','Bihar')
+
+--To find average Growth rate
  
- --select avg(cast(replace(growth,'%','') as double)) as avg_growth from districtparameter;
+ select avg(cast(replace(growth,'%','') as double)) as avg_growth from districtparameter;
  
+--Avg growth rate by state in descending order.
+ select state,round(avg(cast(replace(growth,'%','') as double)),2) as avg_growth_per_state from districtparameter group by state order by avg_growth_per_state desc;
 
- /*select state,round(avg(cast(replace(growth,'%','') as double)),2) as avg_growth_per_state from districtparameter group by state order by avg_growth_per_state desc;
-*/
  --avg sex ratio
  /*select state,truncate(round(avg(sex_ratio),0))as avg_sexRatio_per_state from districtparameter group by state order by avg_growth_per_state desc;
 */
@@ -22,49 +32,49 @@
 /*select state,avg(literacy)as avg_literacy_per_state from districtparameter group by state having avg(literacy) >= 90 
  order by avg_literacy_per_state desc;
 */
+
  --top 3 states with highest growth rate
 
- /*select state,avg(cast(replace(growth,'%','')as double)) as avg_growth from districtparameter
+ select state,avg(cast(replace(growth,'%','')as double)) as avg_growth from districtparameter
  group by state
- order by avg_growth desc limit 3;*
-/
+ order by avg_growth desc limit 3;
+
  --lowest literacy rate bottom 3
 
- /*select state,cast(round(avg(literacy)) as int) as avg_literacy from districtparameter group by state order by avg_literacy  limit 3*/
+ select state,cast(round(avg(literacy)) as int) as avg_literacy from districtparameter group by state order by avg_literacy  limit 3
  
 --Data for all states starting with letter a
 
- /*select  d1.district,d1.state,d1.area_km2,d1.population,d2.growth,d2.sex_ratio,d2.growth from districtdetails d1 inner join districtparameter d2 on d1.State=d2.State and d1.state like 'A%'*
-/
+ select  d1.district,d1.state,d1.area_km2,d1.population,d2.growth,d2.sex_ratio,d2.growth from districtdetails d1 inner join districtparameter d2 on d1.State=d2.State and d1.state like 'A%'*
+
   --Data for all states starting with letter a and ending with d
  
- /*select  d1.district,d1.state,d1.area_km2,d1.population,d2.growth,d2.sex_ratio,d2.growth from districtdetails d1 inner join districtparameter d2 on d1.State=d2.State and d1.state like
+ select  d1.district,d1.state,d1.area_km2,d1.population,d2.growth,d2.sex_ratio,d2.growth from districtdetails d1 inner join districtparameter d2 on d1.State=d2.State and d1.state like
   'A%h'
- */
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ 
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --total population of india
--
--select cast(sum(population) as bigint) from districtdetails;
+
+select cast(sum(population) as bigint) from districtdetails;
 
 --total population per state
-/
-*select state,cast(sum(population) as bigint) as population_sum from districtdetails group by state
-order by population_sum desc*/;
+select state,cast(sum(population) as bigint) as population_sum from districtdetails group by state
+order by population_sum desc;
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --get no of males and females (use of maths to derive,can be derived from sex ratio and population columns)
 
---select district, state, round(c.population/(c.sex_ratio+1)) as males, round((c.population*c.sex_ratio)/(c.sex_ratio+1)) as females
---from(select a.district,a.state,b.sex_ratio/1000 sex_ratio,a.population from districtdetails a join 
---districtparameter b on a.district=b.district) c;
+select district, state, round(c.population/(c.sex_ratio+1)) as males, round((c.population*c.sex_ratio)/(c.sex_ratio+1)) as females
+from(select a.district,a.state,b.sex_ratio/1000 sex_ratio,a.population from districtdetails a join 
+districtparameter b on a.district=b.district) c;
 
 
 --total literacy rate
---
+
 select d.district,d.state, round(d.literacy_ratio * d.population,0) literate_people ,
---round((1-d.literacy_ratio)* d.population,0) illetrate_people from
---(select a.district,a.state,b.literacy/100 literacy_ratio, a.population from districtdetails a -join districtparameter b on a.district = b.district) 
+round((1-d.literacy_ratio)* d.population,0) illetrate_people from
+(select a.district,a.state,b.literacy/100 literacy_ratio, a.population from districtdetails a -join districtparameter b on a.district = b.district) 
 d
-*/
+
 
 --get population in prev census
 
